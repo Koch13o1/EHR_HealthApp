@@ -18,13 +18,22 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     public User register(UserRegistrationRequest request){
-        User user = User.builder()
+        User.UserBuilder userBuilder = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole().toUpperCase())
-                .build();
-        return userRepository.save(user);
+                .role(request.getRole().toUpperCase());
+                //.build();
+
+        if ("SENIOR".equalsIgnoreCase(request.getRole()) && request.getCaregiverId() != null){
+            User caregiver = userRepository.findById(request.getCaregiverId())
+                    .orElseThrow(() -> new RuntimeException("Caregiver not found"));
+            userBuilder.caregiver(caregiver);
+        }
+
+        return userRepository.save(userBuilder.build());
+
+        // return userRepository.save(user);
     }
 
     public LoginResponse login(LoginRequest request){

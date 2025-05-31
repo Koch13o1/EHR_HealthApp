@@ -6,9 +6,12 @@ import com.kochhealth.user_service.dto.UserRegistrationRequest;
 import com.kochhealth.user_service.model.User;
 import com.kochhealth.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,5 +35,16 @@ public class UserController {
         String email = authentication.getName();
         User user = userService.getCurrentUser(email);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/caregiver/seniors")
+    public ResponseEntity<List<User>> getSeniors(Authentication authentication){
+        String email = authentication.getName();
+        User caregiver = userService.getCurrentUser(email);
+
+        if (!"CAREGIVER".equalsIgnoreCase(caregiver.getRole())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(caregiver.getSeniors());
     }
 }

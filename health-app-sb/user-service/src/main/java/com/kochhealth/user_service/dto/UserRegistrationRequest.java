@@ -8,4 +8,6 @@ public class UserRegistrationRequest {
     private String email;
     private String password;
     private String role;
+
+    private Long caregiverId;  // Only for SENIOR role
 }
